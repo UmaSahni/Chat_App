@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useToast } from '@chakra-ui/react'
 
+
 export const userAuth = (url, obj )=>{
     try {
         return axios(url,{
@@ -22,6 +23,7 @@ export const userAuth = (url, obj )=>{
 
 const SignUp = () => {
     const [show, setShow] = useState(true)
+    const [isUploading, setIsUploading] = useState(false)
     const [ state, setState] = useState({
         name:"",
         password:"",
@@ -29,6 +31,52 @@ const SignUp = () => {
         pic:""
     })
     const toast = useToast()
+
+// save Image function
+const savImg = async(e)=>{
+    const file = e.target.files[0]; // Directly use the file from the event
+
+    if (!file) return; // If no file is selected, exit the function
+
+    setIsUploading(true); // Set the uploading state to true
+
+
+    const data = new FormData()
+    data.append("file", file)
+    data.append("upload_preset", "chat_app")
+    data.append("cloud_name", "dnd6b7lfn")
+
+    try {
+        
+            const res = await fetch("https://api.cloudinary.com/v1_1/dnd6b7lfn/image/upload", {
+                method:"POST",
+                body:data
+            })
+
+            const cloudImage = await res.json()
+            // console.log(cloudImage)
+
+            // Update the state with the URL of the uploaded image
+            setState((prevState) => ({
+                ...prevState,
+                pic: cloudImage.url
+            }));
+            setIsUploading(false)
+       
+    } catch (error) {
+       console.log(error)
+        setIsUploading(false)
+        toast({
+            position: 'top-right',
+            title: "Image Upload Failed",
+            description: "Unable to upload profile picture. Please try again.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+        });
+    }
+}
+
 
 // update state function of input field
     const handleChange =  (e) =>{
@@ -52,7 +100,7 @@ const SignUp = () => {
 
         try {
 
-            const response = await userAuth("http://localhost:8080/auth/signup", state)
+            const response = await userAuth("http://localhost:8080/user/signup", state)
             toast.close(loadingToastId);
             console.log(response)
 
@@ -70,6 +118,7 @@ const SignUp = () => {
                 position: 'top-right'
             });
 
+           
             // Reset form state on success
             setState({
                 name: "",
@@ -118,12 +167,11 @@ const SignUp = () => {
 
               <FormControl>
                   <FormLabel>Profile pic</FormLabel>
-                     <Input  name="pic" value={state.pic} onChange={handleChange} border={"transperent"} type='file' />
-                  <FormHelperText>You can upload image up to 1 MB</FormHelperText>
+                      <Input accept='image/*' name="pic"  onChange={savImg} border={"transperent"} type='file' />
               </FormControl>
 
                   <FormControl >
-                      <Button p={0} w={"100%"} colorScheme='red' >
+                      <Button isLoading={isUploading} p={0} w={"100%"} colorScheme='red' >
                           <Input  p={0} type="submit" />
                       </Button> 
                 </FormControl>

@@ -4,11 +4,13 @@ import React, { useState } from 'react'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { userAuth } from './SignUp';
 import { useToast } from '@chakra-ui/react'
+import { useNavigate } from "react-router-dom";
 
 //& <--- Login up component starts from here --->
 
 const Login = () => {
     const [show, setShow] = useState(true)
+    const navigate = useNavigate()
     const [state, setState] = useState({
         password: "",
         email: "",
@@ -25,6 +27,7 @@ const Login = () => {
     // state = { name: "guestUser.example.com", password: "guestUser890"}
     const handleSubmit = async(e, ) => {
         e.preventDefault()
+        
 
         const loadingToastId = toast({
             position: 'top-right',
@@ -57,6 +60,9 @@ const Login = () => {
                 email: "",
             })
 
+            
+            navigate("/chat")
+
         } catch (error) {
             toast.close(loadingToastId);
             console.log("Error coming from here", error);
@@ -83,9 +89,10 @@ const Login = () => {
             isClosable: false,
         })
         try {
-            const response = await userAuth("http://localhost:8080/auth/login", { email: "guestUser@example.com", password: "guestUser890" })
+            const response = await userAuth("http://localhost:8080/user/login", { email: "guestUser@example.com", password: "guestUser890" })
             // Close the loading toast
             toast.close(loadingToastId);
+            navigate("/chat")
 
             // Show success toast with dynamic message from response
             toast({

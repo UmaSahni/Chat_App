@@ -6,23 +6,15 @@ const getData = async () => {
 }
 
 const Chat = () => {
-  const [data, setData] = useState([])
+  
 
-  useEffect(() => {
-    const callData = async () => {
-      const data = await getData()
-      setData(data.data)
-      console.log(data)
-    }
-    callData()
-  }, [])
+  
+
 
 
 
   return (
     <div>Chat
-      {data?.map((el) => <Box>name -
-        {el.chatName}</Box>)}
     </div>
   )
 }

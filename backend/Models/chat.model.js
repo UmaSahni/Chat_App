@@ -2,20 +2,20 @@ const mongoose = require("mongoose")
 
 const chat = mongoose.Schema({
     chatName : {type:String, trim:true},
-    isGroup : {type:Boolean, default:false},
+    isGroupChat : {type:Boolean, default:false},
     users :[
         {
             type:mongoose.Schema.Types.ObjectId,
-            ref:"UserModel"
+            ref:"user"
         }
     ],
-    lastMessage:{
+    latestMessage:{
         type: mongoose.Schema.Types.ObjectId,
-        ref:"MessageModel"
+        ref:"message"
     },
     groupAdmin :{
         type: mongoose.Schema.Types.ObjectId,
-        ref:"UserModel"
+        ref:"user"
     },
 },{
     timestamps:true

@@ -1,10 +1,11 @@
 import { Box, Button, Center, Flex, FormControl, FormHelperText, FormLabel, Input, InputGroup, InputRightAddon, Stack } from '@chakra-ui/react'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { userAuth } from './SignUp';
 import { useToast } from '@chakra-ui/react'
 import { useNavigate } from "react-router-dom";
+import { ChatContext } from '../../Context/ChatProvider';
 
 //& <--- Login up component starts from here --->
 
@@ -16,6 +17,7 @@ const Login = () => {
         email: "",
     })
     const toast = useToast()
+    const { user, setUser } = useContext(ChatContext)
 
     // update state function of input field
     const handleChange = (e) => {
@@ -39,8 +41,8 @@ const Login = () => {
         })
         try {
             
-            const response = await userAuth("http://localhost:8080/auth/login", state )
-           
+           const response = await userAuth("http://localhost:8080/user/login", state )
+           console.log(response)
             // Close the loading toast
             toast.close(loadingToastId);
 
@@ -60,7 +62,9 @@ const Login = () => {
                 email: "",
             })
 
-            
+            setUser(response.data)
+            let userInfo = JSON.stringify(response.data.user)
+            localStorage.setItem("userInfo", userInfo )  
             navigate("/chat")
 
         } catch (error) {

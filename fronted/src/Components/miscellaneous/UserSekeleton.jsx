@@ -10,6 +10,7 @@ const UserSekeleton = () => {
           <Skeleton height='40px' />
           <Skeleton height='40px' />
           <Skeleton height='40px' />
+          <Skeleton height='40px' />
       </Stack>
   )
 }

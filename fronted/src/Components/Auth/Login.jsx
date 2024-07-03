@@ -6,6 +6,7 @@ import { userAuth } from './SignUp';
 import { useToast } from '@chakra-ui/react'
 import { useNavigate } from "react-router-dom";
 import { ChatContext } from '../../Context/ChatProvider';
+import { AuthContext } from '../../Context/AuthContext';
 
 //& <--- Login up component starts from here --->
 
@@ -18,6 +19,7 @@ const Login = () => {
     })
     const toast = useToast()
     const { user, setUser } = useContext(ChatContext)
+    const { token, setToken } = useContext(AuthContext)
 
     // update state function of input field
     const handleChange = (e) => {
@@ -62,23 +64,51 @@ const Login = () => {
                 email: "",
             })
 
-            setUser(response.data)
+            setUser(response.data.user)
             let userInfo = JSON.stringify(response.data.user)
             localStorage.setItem("userInfo", userInfo )  
+            setToken(response.data.token)
             navigate("/chat")
 
         } catch (error) {
             toast.close(loadingToastId);
-            console.log("Error coming from here", error);
-            toast({
-                position: 'top-right',
-                title: "An error occurred",
-                description: error.message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-            });
+
+            console.log("Error coming from here", error.response.status);
+            if (error.response.status === 401){
+                toast({
+                    position: 'top-right',
+                    title: error.response.statusText,
+                    description: error.response.data.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+                
+            }
+            else if (error.response.status === 404){
+                toast({
+                    position: 'top-right',
+                    title: error.response.statusText,
+                    description: error.response.data.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }else{
+                toast({
+                    position: 'top-right',
+                    title: "An error occurred",
+                    description: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+
+            
         }
+
+        console.log(user)
        
     }
 

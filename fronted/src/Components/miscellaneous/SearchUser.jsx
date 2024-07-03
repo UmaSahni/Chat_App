@@ -27,6 +27,10 @@ const SearchUser = () => {
                 }
             }
             const { data } = await axios.get(`http://localhost:8080/user?search=${search}`, config)
+            console.log(chats)
+           
+            if(!chats.find((c)=>c._id === data._id)) setChats([data, ...chats])
+            
             setSearchData(data)
             setLoading(false)
         } catch (error) {

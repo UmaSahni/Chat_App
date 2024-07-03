@@ -5,9 +5,11 @@ import SignUp from '../Components/Auth/SignUp'
 
 const Auth = () => {
   return (
-      <Box bg={"#2b2d42"} minH={"100vh"}
+      <Box
+          bg={"#2b2d42"}
+          minH={"100vh"}
           backgroundImage="url('file.svg')"
-        //   backgroundSize="cover"
+          //   backgroundSize="cover"
           backgroundPosition="center"
       
       >

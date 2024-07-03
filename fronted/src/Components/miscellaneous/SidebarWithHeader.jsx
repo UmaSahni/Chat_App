@@ -23,6 +23,9 @@ import {
     MenuList,
     useConst,
     Input,
+    useToast,
+    Button,
+    Stack,
 } from '@chakra-ui/react'
 import {
     FiHome,
@@ -35,18 +38,12 @@ import {
     FiChevronDown,
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ChatContext } from '../../Context/ChatProvider'
 import ProfileModal from './ProfileModal'
 import SearchUser from './SearchUser'
-
-
-
-
-
-
-
-
+import axios from 'axios'
+import { getSender } from '../../config/ChatLogics'
 
 const LinkItems = [
     { name: 'Home', icon: FiHome },
@@ -59,6 +56,43 @@ const LinkItems = [
 
 // My chats
 const SidebarContent = ({ onClose, ...rest }) => {
+    const [loggedUser, setLoggedUser] = useState(null);
+    const toast = useToast();
+    const { user, setSelectedChat, selectedChat, chats, setChats } = useContext(ChatContext);
+
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo) {
+            setLoggedUser(userInfo);
+        } else {
+            console.error("User info not found in localStorage");
+        }
+        fetchChats();
+    }, []);
+
+    const fetchChats = async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            };
+
+            const { data } = await axios.get(`http://localhost:8080/chat`, config);
+            console.log(data);
+            setChats(data);
+        } catch (error) {
+            toast({
+                position: 'top-left',
+                title: "Error Occurred!",
+                description: "Failed to load the chats",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
     return (
         <Box
             transition="3s ease"
@@ -75,13 +109,36 @@ const SidebarContent = ({ onClose, ...rest }) => {
                 </Text>
                 <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
             </Flex>
-            {LinkItems.map((link) => (
-                <NavItem key={link.name} icon={link.icon}>
-                    {link.name} 
-                </NavItem>
-            ))}
+            <Button>Create Group</Button>
+            {
+                chats ? (
+                    <Stack overflowY={"scroll"}>
+                        {
+                            chats.map((chat) => (
+                                <Box
+                                    onClick={() => setSelectedChat(chat)}
+                                    cursor={"pointer"}
+                                    bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
+                                    color={selectedChat === chat ? "white" : "black"}
+                                    px={3}
+                                    py={2}
+                                    key={chat._id}
+                                >
+                                    <Text>
+                                        {
+                                            !chat.isGroupChat ? (
+                                                getSender(loggedUser, chat.users)
+                                            ) : (chat.chatName)
+                                        }
+                                    </Text>
+                                </Box>
+                            ))
+                        }
+                    </Stack>
+                ) : "loading..."
+            }
         </Box>
-    )
+    );
 }
 
 const NavItem = ({ icon, children, ...rest }) => {

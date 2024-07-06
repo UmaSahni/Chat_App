@@ -66,7 +66,7 @@ const SideDrawer = () => {
         `http://localhost:8080/user?search=${search}`,
         config
       );
-      console.log(data);
+      // console.log(data);
       setSearchResult(data);
       // if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats])
 
@@ -97,7 +97,7 @@ const SideDrawer = () => {
                 
             };
             const { data } = await axios.post( `http://localhost:8080/chat`,{userId} ,config);
-            console.log(data)
+            // console.log(data)
             if(!chats.find((c)=>c._id == data._id)) setChats([data, ...chats])
 
             setSelectedChat(data)
@@ -172,7 +172,7 @@ const SideDrawer = () => {
               />
             </MenuButton>
             <MenuList color={"black"} bg={"#a0aeb4"}>
-              <ProfileModal>
+              <ProfileModal user={user} >
                 <MenuItem
                   _hover={{ bg: "#79868b", color: "white" }}
                   bg={"#a0aeb4"}

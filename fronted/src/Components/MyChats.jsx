@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../Context/ChatProvider";
-import { Box, useToast, Text, Button, Stack } from "@chakra-ui/react";
+import { Box, useToast, Text, Button, Stack, Avatar, useDisclosure } from "@chakra-ui/react";
 import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 import { AddIcon } from "@chakra-ui/icons";
 import UserSekeleton from "./miscellaneous/UserSekeleton";
 import { getSender } from "../config/ChatLogics";
+import GroupChatModal from "./miscellaneous/GroupChatModal";
 
-const MyChats = () => {
+const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
   const {
     user,
@@ -29,8 +30,8 @@ const MyChats = () => {
       };
 
       const { data } = await axios.get(`http://localhost:8080/chat`, config);
-      console.log(data, "lists of the chats");
       setChats(data);
+     
     } catch (error) {
       toast({
         position: "top-left",
@@ -43,10 +44,14 @@ const MyChats = () => {
     }
   };
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   useEffect(() => {
     setLoggedUser(user);
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
+
+  console.log("This is logged user", loggedUser)
 
   return (
     <Box
@@ -68,9 +73,10 @@ const MyChats = () => {
         alignItems={"center"}
       >
         <Text>My Chats</Text>
-        <Button>
-          {" "}
+          <Button onClick={onOpen} fontSize={{base:"1rem", md:"0.5rem", lg:"1rem"}}  >
+          <GroupChatModal isOpen={isOpen} onClose={onClose} >
           <AddIcon mr={3} /> Create Group Chat
+        </GroupChatModal>
         </Button>
       </Box>
 
@@ -89,18 +95,38 @@ const MyChats = () => {
             {chats.map((chat) => {
               return (
                 <Box
+                  key={chat._id}
                   onClick={() => setSelectedChat(chat)}
                   cursor={"pointer"}
                   bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
                   color={selectedChat === chat ? "white" : "black"}
                   px={3}
+                  display={"flex"}
+                  alignItems={"center"}
                   py={2}
-                  key={chat._id}
+                  
                 >
-                  <Text>
-                    {!chat.isGroupChat
-                      ? getSender(loggedUser, chat.users)
-                      : chat.chatName}
+                  <Avatar
+                  
+                  src={
+                    chat.isGroupChat === false
+                  ? (getSender(loggedUser, chat.users).pic)
+                        : chat.chatName
+                    }
+                  
+                  
+                  />
+                  
+                  <Text
+                  pl={3}>
+                    {chat.isGroupChat === false
+                      ? (getSender(loggedUser, chat.users).name)
+                      : (
+                        
+                        chat.chatName
+                        
+                        )}
+
                   </Text>
                 </Box>
               );

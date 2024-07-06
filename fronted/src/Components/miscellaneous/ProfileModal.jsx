@@ -19,10 +19,9 @@ import {
 import { useContext } from 'react'
 import { ChatContext } from '../../Context/ChatProvider'
 
-const ProfileModal = ({children}) => {
+const ProfileModal = ({children, user}) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const { user } = useContext(ChatContext)
-    // console.log(user)
+    console.log(user)
     return <>
     {
         children ? <span onClick={onOpen}>{children}</span> : (
@@ -45,8 +44,8 @@ const ProfileModal = ({children}) => {
                     alt={user.name}
                     />
                     </Center>
-                    <Text> <b>Name:</b> {user.name}</Text>
-                    <Text> <b>Email:</b> {user.email}</Text>
+                    <Text> <b>Name:</b> {user.name}</Text> 
+                    <Text> <b>Email:</b> {user.email}</Text> 
                     
                 </ModalBody>
 

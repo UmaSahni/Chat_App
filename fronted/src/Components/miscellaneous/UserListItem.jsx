@@ -2,6 +2,7 @@ import { Avatar, Box, Text } from "@chakra-ui/react";
 import React from "react";
 
 const UserListItem = ({ name, email, pic, handleFunction }) => {
+  
   return (
     <Box
       onClick={handleFunction}

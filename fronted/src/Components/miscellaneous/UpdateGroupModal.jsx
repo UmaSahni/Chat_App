@@ -16,7 +16,7 @@ import { AuthContext } from '../../Context/AuthContext'
 import axios from 'axios'
 import UserListItem from './UserListItem'
 
-const UpdateGroupModal = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     const {
         user,
         setUser,
@@ -204,6 +204,7 @@ const UpdateGroupModal = ({ fetchAgain, setFetchAgain }) => {
         user1._id == user._id ? setSelectedChat() : setSelectedChat(data)
         
         setFetchAgain(!fetchAgain)
+        fetchMessages()
         setLoading(false)
         } catch (error) {
             toast({

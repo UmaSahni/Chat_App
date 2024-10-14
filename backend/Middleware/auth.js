@@ -8,7 +8,7 @@ const auth = async(req, res, next) =>{
         if(token){
             token = token.split(" ")[1]
             var decoded = jwt.verify(token, process.env.SECRECT_KEY);
-            console.log(decoded, "I am in middleware") // { user: '667a7fa9e2e0810b78d993e3', iat: 1719304389 }
+            // console.log(decoded, "I am in middleware") // { user: '667a7fa9e2e0810b78d993e3', iat: 1719304389 }
             req.user = decoded.userID
             next()
         }

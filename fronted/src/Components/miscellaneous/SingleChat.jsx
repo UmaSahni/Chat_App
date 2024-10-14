@@ -1,94 +1,153 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../../Context/ChatProvider";
-import { Box, Flex, FormControl, IconButton, Input, Spinner, Text, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { getSender } from "../../config/ChatLogics";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
 import UpdateGroupModal from "./UpdateGroupModal";
 import { AuthContext } from "../../Context/AuthContext";
 import axios from "axios";
-import "./styles.css"
+import "./styles.css";
 import SrcollableChat from "../SrcollableChat";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:8080";
+var socket, selectedChatCompare;
+
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+  const { user, selectedChat, setSelectedChat } = useContext(ChatContext);
 
-  const {
-    user,
-    selectedChat,
-    setSelectedChat,
-  } = useContext(ChatContext);
+  const { token } = useContext(AuthContext);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoding] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false)
+  const toast = useToast();
 
-const {token} = useContext(AuthContext)
-const [messages, setMessages] = useState([])
-const [loading, setLoding] = useState(false)
-const [newMessage,setNewMessage] = useState("")
-const toast = useToast()
 
-const fetchMessages = async () =>{
-  if(!selectedChat) return
-  try {
-    setLoding(true)
-   
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-    
-    const { data } = await axios.get(`http://localhost:8080/message/${selectedChat._id}`, config)
+  
+  useEffect(() => {
+    console.log(ENDPOINT);
+    socket = io(ENDPOINT);
+    console.log(user);
 
-    console.log(data)
-    setMessages(data)
-    setLoding(false)
-  } catch (error) {
-    setLoding(false)
-    toast({
-      title: "Error occured unable to load messages",
-      position: "top",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
+
+    socket.emit("setup", user)
+    console.log(user._id)
+    socket.on("connected", ()=>{
+      setSocketConnected(true)
     })
-  }
-}
-
-useEffect(()=>{
-fetchMessages()
-},[selectedChat])
 
 
-  const sendMessage = async(event) =>{
-  if(event.key === "Enter" && newMessage){
+  }, []);
+
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
     try {
-      
-      const config ={
-        headers:{
-          "Content-type":"application/json",
-           Authorization : `Bearer ${token}`
-        }
-      }
-      setNewMessage("")
-      const { data } = await axios.post(`http://localhost:8080/message`, {
-        chatId:selectedChat._id,
-        content:newMessage
-      }, config)
+      setLoding(true);
 
-      console.log(data)
-      setMessages([...messages, data])
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const { data } = await axios.get(
+        `http://localhost:8080/message/${selectedChat._id}`,
+        config
+      );
+
+      // console.log(data)
+      setMessages(data);
+      setLoding(false);
+
+socket.emit("join chat", selectedChat._id)
+
+
+
     } catch (error) {
+      setLoding(false);
       toast({
-        title: "Error occured",
+        title: "Error occured unable to load messages",
         position: "top",
         status: "error",
         duration: 5000,
         isClosable: true,
-      })
+      });
     }
-  }
-  }
-  const typingHandler =(e)=>{
-  setNewMessage(e.target.value)
-// Typing indicator logic here
-  }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+    selectedChatCompare = selectedChat;
+
+  }, [selectedChat]);
+
+  useEffect(()=>{
+    socket.on("message recieved", (newMessageRecieved)=>{
+      if(!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id){
+        // give notification
+      }
+      else{
+        setMessages([...messages, newMessageRecieved])
+      }
+
+    })
+  })
+
+  const sendMessage = async (event) => {
+    if (event.key === "Enter" && newMessage) {
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        setNewMessage("");
+        const { data } = await axios.post(
+          `http://localhost:8080/message`,
+          {
+            chatId: selectedChat._id,
+            content: newMessage,
+          },
+          config
+        );
+
+        console.log(data);
+
+        socket.emit("new message", data)
+
+        setMessages([...messages, data]);
+      } catch (error) {
+        toast({
+          title: "Error occured",
+          position: "top",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+    // Typing indicator logic here
+  };
+
+
 
   // console.log(selectedChat);
   return (
@@ -119,12 +178,11 @@ fetchMessages()
                 <>
                   {selectedChat.chatName.toUpperCase()}
                   {/* Update group chat modal */}
-                    <UpdateGroupModal
-                    fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} 
-                      fetchMessages={fetchMessages}                   
-
-                    />
-
+                  <UpdateGroupModal
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                    fetchMessages={fetchMessages}
+                  />
                 </>
               )}
             </Flex>
@@ -142,36 +200,34 @@ fetchMessages()
             overflowY={"scroll"}
           >
             {/* Messages here */}
-            
-            {
-              loading ? (
-                <Spinner 
+
+            {loading ? (
+              <Spinner
                 color="#000"
                 size={"xl"}
                 w={20}
                 h={20}
-                
                 alignItems={"center"}
                 margin={"auto"}
-                />
-              ) : 
+              />
+            ) : (
               <>
-              {/* All messages */}
-              <div className="messages">
-                <SrcollableChat messages={messages} />
-              </div>
+                {/* All messages */}
+                <div className="messages">
+                  <SrcollableChat messages={messages} />
+                </div>
               </>
-            }
+            )}
 
-            <FormControl isRequired mt={3} onKeyDown={sendMessage} >
+            <FormControl isRequired mt={3} onKeyDown={sendMessage}>
               <Input
-              color={"black"}
-              bg={"#ffff"}
+                color={"black"}
+                bg={"#ffff"}
                 focusBorderColor="transparent"
-             border={"none"}
-              placeholder="Enter a message"
-              onChange={typingHandler}
-              value={newMessage}
+                border={"none"}
+                placeholder="Enter a message"
+                onChange={typingHandler}
+                value={newMessage}
               />
             </FormControl>
           </Box>

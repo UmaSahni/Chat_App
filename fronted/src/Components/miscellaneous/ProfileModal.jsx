@@ -20,6 +20,7 @@ import { useContext } from 'react'
 import { ChatContext } from '../../Context/ChatProvider'
 
 const ProfileModal = ({children, user}) => {
+
     const { isOpen, onOpen, onClose } = useDisclosure()
     console.log(user)
     return <>
@@ -40,12 +41,12 @@ const ProfileModal = ({children, user}) => {
                 <ModalBody>
                     <Center>
                     <Image
-                    src={user.pic}
-                    alt={user.name}
+                    src={user?.pic}
+                    alt={user?.name}
                     />
                     </Center>
-                    <Text> <b>Name:</b> {user.name}</Text> 
-                    <Text> <b>Email:</b> {user.email}</Text> 
+                    <Text> <b>Name:</b> {user?.name}</Text> 
+                    <Text> <b>Email:</b> {user?.email}</Text> 
                     
                 </ModalBody>
 

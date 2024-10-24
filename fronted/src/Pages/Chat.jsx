@@ -9,7 +9,7 @@ import ChatBox from '../Components/ChatBox'
 
 const Chat = () => {
   
-  const { user } = useContext(ChatContext)
+  const  user  = JSON.parse(localStorage.getItem("userInfo")) 
   const [fetchAgain, setFetchAgain] = useState(false)
 
 console.log(user)

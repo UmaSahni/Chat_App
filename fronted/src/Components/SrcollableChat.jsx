@@ -5,7 +5,7 @@ import { Avatar, Flex, Tooltip } from '@chakra-ui/react'
 import { ChatContext } from '../Context/ChatProvider'
 
 const SrcollableChat = ({messages}) => {
-    const {user} = useContext(ChatContext)
+    const user = JSON.parse(localStorage.getItem("userInfo")) 
     console.log(messages, user)
   return (
       <ScrollableFeed>
@@ -40,7 +40,7 @@ const SrcollableChat = ({messages}) => {
                         margin: m.sender._id === user._id ? "0px 0px 5px auto" : "0px 0px 5px 0px"
                     }}
                 >
-                    {m.content} - {i}
+                    {m.content} 
 
                 </span>
                 

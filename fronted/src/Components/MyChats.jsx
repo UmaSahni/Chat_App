@@ -9,9 +9,9 @@ import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 
 const MyChats = ({ fetchAgain }) => {
-  const [loggedUser, setLoggedUser] = useState();
+
+  const [loggedUser, setLoggedUser] = useState(null || JSON.parse(localStorage.getItem("userInfo")));
   const {
-    user,
     setUser,
     selectedChat,
     setSelectedChat,
@@ -19,8 +19,12 @@ const MyChats = ({ fetchAgain }) => {
     setChats,
   } = useContext(ChatContext);
   const toast = useToast();
-  const { token } = useContext(AuthContext);
+  const  token  = localStorage.getItem("token")
+  const user = JSON.parse(localStorage.getItem("userInfo")) 
 
+
+
+  console.log(user)
   const fetchChats = async () => {
     try {
       const config = {

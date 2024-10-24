@@ -68,6 +68,7 @@ const Login = () => {
             let userInfo = JSON.stringify(response.data.user)
             localStorage.setItem("userInfo", userInfo )  
             setToken(response.data.token)
+            localStorage.setItem("token",response.data.token )
             navigate("/chat")
 
         } catch (error) {
@@ -126,6 +127,12 @@ const Login = () => {
             const response = await userAuth("http://localhost:8080/user/login", { email: "guestUser@example.com", password: "guestUser890" })
             // Close the loading toast
             toast.close(loadingToastId);
+
+            setUser(response.data.user)
+            let userInfo = JSON.stringify(response.data.user)
+            localStorage.setItem("userInfo", userInfo )  
+            localStorage.setItem("token",response.data.token )
+            setToken(response.data.token)
             navigate("/chat")
 
             // Show success toast with dynamic message from response

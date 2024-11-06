@@ -33,13 +33,14 @@ const SideDrawer = () => {
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-    const { user, setSelectedChat,  chats, setChats } = useContext(ChatContext);
+    const {setSelectedChat,  chats, setChats } = useContext(ChatContext);
   const navigate = useNavigate();
   const toast = useToast();
- const {token, setToken} = useContext(AuthContext)
-
-  const logoutHandler = () => {
-    setToken(null);
+//  const {token, setToken} = useContext(AuthContext)
+let token = localStorage.getItem("token")
+ const user = JSON.parse(localStorage.getItem("userInfo"))
+const logoutHandler = () => {
+   token = null;
     navigate("/auth");
   };
 
@@ -165,10 +166,10 @@ const SideDrawer = () => {
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
               <Avatar
-                src={user.pic}
+                src={user?.pic}
                 size={"sm"}
                 cursor={"pointer"}
-                name={user.name}
+                name={user?.name}
               />
             </MenuButton>
             <MenuList color={"black"} bg={"#a0aeb4"}>
@@ -214,10 +215,10 @@ const SideDrawer = () => {
                           searchResult.length > 0 ? (
                               searchResult.map(user => (
                                   <UserListItem
-                                      key={user._id}
-                                      name={user.name}
-                                      email={user.email}
-                                      pic={user.pic}
+                                      key={user?._id}
+                                      name={user?.name}
+                                      email={user?.email}
+                                      pic={user?.pic}
                                       handleFunction={() => accessChat(user._id)}
                                   />
                               ))

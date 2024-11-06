@@ -24,8 +24,8 @@ const ENDPOINT = "http://localhost:8080";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-  const { user, selectedChat, setSelectedChat } = useContext(ChatContext);
-
+  const {  selectedChat, setSelectedChat } = useContext(ChatContext);
+  const user = JSON.parse(localStorage.getItem("userInfo")) 
   const { token } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [loading, setLoding] = useState(false);
@@ -38,11 +38,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     console.log(ENDPOINT);
     socket = io(ENDPOINT);
+    
     console.log(user);
 
 
     socket.emit("setup", user)
-    console.log(user._id)
+    console.log(user?._id)
     socket.on("connected", ()=>{
       setSocketConnected(true)
     })
@@ -95,7 +96,7 @@ socket.emit("join chat", selectedChat._id)
 
   useEffect(()=>{
     socket.on("message recieved", (newMessageRecieved)=>{
-      if(!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id){
+      if(!selectedChatCompare || selectedChatCompare?._id !== newMessageRecieved.chat?._id){
         // give notification
       }
       else{
@@ -118,7 +119,7 @@ socket.emit("join chat", selectedChat._id)
         const { data } = await axios.post(
           `http://localhost:8080/message`,
           {
-            chatId: selectedChat._id,
+            chatId: selectedChat?._id,
             content: newMessage,
           },
           config
@@ -168,8 +169,14 @@ socket.emit("join chat", selectedChat._id)
                 icon={<ArrowBackIcon />}
                 onClick={() => setSelectedChat("")}
               />
+              {
+                  console.log(getSender(user, selectedChat.users))
+              }
 
-              {selectedChat.isGroupChat === false ? (
+              {
+            
+              selectedChat.isGroupChat === false ? (
+                
                 <>
                   {getSender(user, selectedChat.users).name}
                   <ProfileModal user={getSender(user, selectedChat.users)} />

@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
 
 const PrivateRoute = ({children}) => {
-    const { token } = useContext(AuthContext)
+    const  token  = localStorage.getItem("token")
     
     if(!token) return <Navigate to={"/auth"} />
   

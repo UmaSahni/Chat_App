@@ -1,6 +1,8 @@
 import { Center, Heading } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import HeroSection from '../Components/LandingPage/HeroSection'
+import Navbar from '../Components/LandingPage/Navbar'
 
 const Home = () => {
 
@@ -16,7 +18,10 @@ const navigate = useNavigate()
 
   return (
     <div>
-      <Center><Heading>This is Home page</Heading></Center>
+      
+        <Navbar/>
+        <HeroSection/>
+      
     </div>
   )
 }
